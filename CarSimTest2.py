@@ -255,7 +255,8 @@ class CarSimTest2(OpenRTM_aist.DataFlowComponentBase):
             #print self._d_status.acceleration
 
 		return RTC.RTC_OK
-        
+
+
         '''
         if self._commandOut.isNew():
             self._d_command = self._commandOut.read()
