@@ -75,7 +75,7 @@ class CarSimTest(OpenRTM_aist.DataFlowComponentBase):
 		"""
 		"""
 		self._simulatorIn = OpenRTM_aist.InPort("simulator", self._d_simulator)
-		self._d_command = ogata_lab.CarCommand(RTC.Time(0,0), 0,0,0)
+		self._d_command = ogata_lab.CarCommand(RTC.Time(0,0), 0, 0 ,0)
 		"""
 		"""
 		self._commandOut = OpenRTM_aist.OutPort("command", self._d_command)
@@ -252,11 +252,8 @@ class CarSimTest(OpenRTM_aist.DataFlowComponentBase):
 		if self._statusIn.isNew():
 			self._d_status = self._statusIn.read()
 			self._received = True
-			print self._d_status.velocity
-            #print self._d_status.acceleration
-            
-            
-            
+                        self._d_command.acceleratorPressMeter = 1
+			self._commandOut.write()
 
 		return RTC.RTC_OK
 	

@@ -244,27 +244,16 @@ class CarSimTest2(OpenRTM_aist.DataFlowComponentBase):
                         canvas.update()
                         
 	def onExecute(self, ec_id):
-            
         # print "onExecute"
 
 		if self._statusIn.isNew():
 			self._d_status = self._statusIn.read()
 			self._received = True
-			print self._d_status.velocity
-            #print self._d_command
-            #print self._d_status.acceleration
+                        self._d_command.acceleratorPressMeter = 1
 
-		return RTC.RTC_OK
-
-
-        '''
-        if self._commandOut.isNew():
-            self._d_command = self._commandOut.read()
-            self._received = True
-            print self._d_command.tm
-            
+        
         return RTC.RTC_OK
-        '''
+
 
 	#	##
 	#	#
