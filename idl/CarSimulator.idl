@@ -1,0 +1,35 @@
+#include "BasicDataType.idl"
+#include "ExtendedDataTypes.idl"
+
+module ogata_lab {
+
+  struct CarCommand {
+    RTC::Time tm;
+    double handleAngleRad;
+    double acceleratorPressMeter;
+    double breakPressMeter;
+  };
+
+  struct CameraData {
+    unsigned long width;
+    unsigned long height;
+    sequence<octet> pixels;
+  };
+
+  struct CarStatus {
+    RTC::Time tm;
+    CameraData frontLeftCamera;
+    CameraData frontRightCamera;
+    CameraData frontCenterCamera;
+    RTC::Velocity3D velocity;
+    ///RTC::AngularVelocity3D angularVelocity;
+    RTC::Acceleration3D acceleration;
+    RTC::AngularAcceleration3D angularAcecleration;
+  };
+
+  struct SimulatorStatus {
+    RTC::Time tm;
+    RTC::Pose3D pose;
+  };
+
+};
