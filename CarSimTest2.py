@@ -250,9 +250,8 @@ class CarSimTest2(OpenRTM_aist.DataFlowComponentBase):
 			self._d_status = self._statusIn.read()
 			self._received = True
                         self._d_command.acceleratorPressMeter = 1
-
-        
-        return RTC.RTC_OK
+                        self._commandOut.write()
+                        return RTC.RTC_OK
 
 
 	#	##

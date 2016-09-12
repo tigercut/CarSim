@@ -26,6 +26,10 @@ import cv2
 
 from PIL import Image
 
+import math
+
+import numpy as np
+
 # Import Service implementation class
 # <rtc-template block="service_impl">
 
@@ -252,7 +256,9 @@ class CarSimTest(OpenRTM_aist.DataFlowComponentBase):
 		if self._statusIn.isNew():
 			self._d_status = self._statusIn.read()
 			self._received = True
-                        self._d_command.acceleratorPressMeter = 1
+                        x = np.random.randn(1)
+                        self._d_command.acceleratorPressMeter = math.sin(x)
+                        self._d_command.handleAngleRad = math.sin(x)
 			self._commandOut.write()
 
 		return RTC.RTC_OK
