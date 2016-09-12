@@ -19,6 +19,17 @@ import OpenRTM_aist
 
 import ogata_lab
 
+
+import Tkinter as tk
+
+import cv2
+
+from PIL import Image
+
+import math
+
+import numpy as np
+
 # Import Service implementation class
 # <rtc-template block="service_impl">
 
@@ -49,26 +60,26 @@ carsimtest_spec = ["implementation_id", "CarSimTest",
 ##
 # @class CarSimTest
 # @brief ModuleDescription
-# 
-# 
+#
+#
 class CarSimTest(OpenRTM_aist.DataFlowComponentBase):
 	
 	##
 	# @brief constructor
 	# @param manager Maneger Object
-	# 
+	#
 	def __init__(self, manager):
 		OpenRTM_aist.DataFlowComponentBase.__init__(self, manager)
 
-		self._d_status = ogata_lab.CarStatus(),0)
+		self._d_status = ogata_lab.CarStatus(ogata_lab.CameraData(0,0,[]), ogata_lab.CameraData(0,0,[]), ogata_lab.CameraData(0,0,[]), RTC.Velocity3D(0,0,0, 0, 0, 0), RTC.AngularVelocity3D(0,0,0), RTC.Acceleration3D(0,0,0), RTC.AngularAcceleration3D(0,0,0))
 		"""
 		"""
 		self._statusIn = OpenRTM_aist.InPort("status", self._d_status)
-		self._d_simulator = ogata_lab.SimulatorStatus(),0)
+		self._d_simulator = ogata_lab.SimulatorStatus(RTC.Time(0,0), RTC.Pose3D(RTC.Point3D(0,0,0), RTC.Orientation3D(0,0,0)))
 		"""
 		"""
 		self._simulatorIn = OpenRTM_aist.InPort("simulator", self._d_simulator)
-		self._d_command = ogata_lab.CarCommand(),0)
+		self._d_command = ogata_lab.CarCommand(RTC.Time(0,0), 0, 0 ,0)
 		"""
 		"""
 		self._commandOut = OpenRTM_aist.OutPort("command", self._d_command)
@@ -93,10 +104,10 @@ class CarSimTest(OpenRTM_aist.DataFlowComponentBase):
 	##
 	#
 	# The initialize action (on CREATED->ALIVE transition)
-	# formaer rtc_init_entry() 
-	# 
+	# formaer rtc_init_entry()
+	#
 	# @return RTC::ReturnCode_t
-	# 
+	#
 	#
 	def onInitialize(self):
 		# Bind variables and configuration variable
@@ -114,17 +125,19 @@ class CarSimTest(OpenRTM_aist.DataFlowComponentBase):
 		# Set service consumers to Ports
 		
 		# Set CORBA Service Ports
+
+		self._received = False
 		
 		return RTC.RTC_OK
 	
 	#	##
-	#	# 
+	#	#
 	#	# The finalize action (on ALIVE->END transition)
 	#	# formaer rtc_exiting_entry()
-	#	# 
+	#	#
 	#	# @return RTC::ReturnCode_t
 	#
-	#	# 
+	#	#
 	#def onFinalize(self):
 	#
 	#	return RTC.RTC_OK
@@ -133,7 +146,7 @@ class CarSimTest(OpenRTM_aist.DataFlowComponentBase):
 	#	#
 	#	# The startup action when ExecutionContext startup
 	#	# former rtc_starting_entry()
-	#	# 
+	#	#
 	#	# @param ec_id target ExecutionContext Id
 	#	#
 	#	# @return RTC::ReturnCode_t
@@ -163,7 +176,7 @@ class CarSimTest(OpenRTM_aist.DataFlowComponentBase):
 	#	# former rtc_active_entry()
 	#	#
 	#	# @param ec_id target ExecutionContext Id
-	#	# 
+	#	#
 	#	# @return RTC::ReturnCode_t
 	#	#
 	#	#
@@ -195,12 +208,73 @@ class CarSimTest(OpenRTM_aist.DataFlowComponentBase):
 		# @return RTC::ReturnCode_t
 		#
 		#
+
+	def animation(self):
+                print "Animation"
+                
+                root.after(1000, self.animation)
+                if not self._received:
+                        return
+                for i in range(178):
+                        for j in range(178):
+                                
+                                lr = self._d_status.frontLeftCamera.pixels[(178 * i + j) * 3 + 0]
+                                lg = self._d_status.frontLeftCamera.pixels[(178 * i + j) * 3 + 1]
+                                lb = self._d_status.frontLeftCamera.pixels[(178 * i + j) * 3 + 2]
+
+                                rr = self._d_status.frontRightCamera.pixels[(178 * i + j) * 3 + 0]
+                                rg = self._d_status.frontRightCamera.pixels[(178 * i + j) * 3 + 1]
+                                rb = self._d_status.frontRightCamera.pixels[(178 * i + j) * 3 + 2]
+                               
+                                cr = self._d_status.frontCenterCamera.pixels[(178 * i + j) * 3 + 0]
+                                cg = self._d_status.frontCenterCamera.pixels[(178 * i + j) * 3 + 1]
+                                cb = self._d_status.frontCenterCamera.pixels[(178 * i + j) * 3 + 2]
+                                 
+                                rl = ord(lr)
+                                gl = ord(lg)
+                                bl = ord(lb)
+
+                                rr = ord(rr)
+                                gr = ord(rg)
+                                br = ord(rb)
+                               
+                                rc = ord(cr)
+                                gc = ord(cg)
+                                bc = ord(cb)
+
+                                #print (rc, gc, bc)
+                                image_ldata.put("#%02x%02x%02x" % (rl,gl,bl), (j, 177 - i))
+                                image_rdata.put("#%02x%02x%02x" % (rr,gr,br), (j, 177 - i))
+                                image_cdata.put("#%02x%02x%02x" % (rc,gc,bc), (j, 177 - i))
+
+                                #cv2.flip(image_data,0)
+
+                        canvas.update()
+                        
 	def onExecute(self, ec_id):
+                # print "onExecute"
+                t = int(time.clock())
 		if self._statusIn.isNew():
 			self._d_status = self._statusIn.read()
-			print self._d_status
+			self._received = True
+                        x = np.random.randn(1)
+                        self._d_command.acceleratorPressMeter = 0.5
+                        #self._d_command.handleAngleRad = math.sin(x)
+                        #self._d_command.acceleratorPressMeter = 1
+                        if(t % 2 == 0):
+                            self._d_command.handleAngleRad = -1
+                        elif(t % 2 == 1):
+                            self._d_command.handleAngleRad = 1
+                        #else:
+                         #   self._d_command.handleAngleRad = 0
+
+                        print t
+			self._commandOut.write()
+
 		return RTC.RTC_OK
 	
+
+
 	#	##
 	#	#
 	#	# The aborting action when main logic error occurred.
@@ -272,8 +346,23 @@ class CarSimTest(OpenRTM_aist.DataFlowComponentBase):
 	#
 	#	return RTC.RTC_OK
 	
+#draw with TK
+root = tk.Tk()
+canvas = tk.Canvas(root, width = 600, height = 200)
 
+image_cdata = tk.PhotoImage(width = 178, height = 178)
+image_rdata = tk.PhotoImage(width = 178, height = 178)
+image_ldata = tk.PhotoImage(width = 178, height = 178)
 
+#print image_data
+#canvas.create_image(200, 150, image = image_data)
+canvas.create_image(300, 100 , image = image_cdata)
+canvas.create_image(500, 100 , image = image_rdata)
+canvas.create_image(100, 100 , image = image_ldata)
+
+canvas.pack()
+
+comp = None
 
 def CarSimTestInit(manager):
     profile = OpenRTM_aist.Properties(defaults_str=carsimtest_spec)
@@ -285,13 +374,16 @@ def MyModuleInit(manager):
     CarSimTestInit(manager)
 
     # Create a component
+    global comp
     comp = manager.createComponent("CarSimTest")
 
 def main():
 	mgr = OpenRTM_aist.Manager.init(sys.argv)
 	mgr.setModuleInitProc(MyModuleInit)
 	mgr.activateManager()
-	mgr.runManager()
+	mgr.runManager(True)
+	root.after(1000, comp.animation)
+        root.mainloop()
 
 if __name__ == "__main__":
 	main()

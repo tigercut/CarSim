@@ -180,9 +180,9 @@ class CarSimTest(OpenRTM_aist.DataFlowComponentBase):
 	#	# @return RTC::ReturnCode_t
 	#	#
 	#	#
-	#def onActivated(self, ec_id):
-	#
-	#	return RTC.RTC_OK
+	def onActivated(self, ec_id):
+		self._activatedClock = time.clock() ## Here, the time when onActivated called is stored as a member variable of this class.
+		return RTC.RTC_OK
 	
 	#	##
 	#	#
@@ -194,9 +194,9 @@ class CarSimTest(OpenRTM_aist.DataFlowComponentBase):
 	#	# @return RTC::ReturnCode_t
 	#	#
 	#	#
-	#def onDeactivated(self, ec_id):
-	#
-	#	return RTC.RTC_OK
+	def onDeactivated(self, ec_id):
+	
+		return RTC.RTC_OK
 	
 		##
 		#
@@ -253,23 +253,26 @@ class CarSimTest(OpenRTM_aist.DataFlowComponentBase):
                         
 	def onExecute(self, ec_id):
                 # print "onExecute"
-                t = int(time.clock())
+                duration = time.clock() - self._activatedClock ## Here, the duration (time from activated).
 		if self._statusIn.isNew():
 			self._d_status = self._statusIn.read()
 			self._received = True
-                        x = np.random.randn(1)
-                        self._d_command.acceleratorPressMeter = 0.5
-                        #self._d_command.handleAngleRad = math.sin(x)
-                        #self._d_command.acceleratorPressMeter = 1
-                        if(t % 2 == 0):
-                            self._d_command.handleAngleRad = -1
-                        elif(t % 2 == 1):
-                            self._d_command.handleAngleRad = 1
-                        #else:
-                         #   self._d_command.handleAngleRad = 0
 
-                        print t
-			self._commandOut.write()
+		# Even when the status packet is NOT received, the target command may be sent.
+		# x = np.random.randn(1) x is not needed.
+		self._d_command.acceleratorPressMeter = math.sin(duration / self._interval * 2 * math.pi) ## Here, this is the simplest occilation method
+		# self._d_command.
+		#self._d_command.handleAngleRad = math.sin(x)
+                #self._d_command.acceleratorPressMeter = 1
+                # if(t % 2 == 0):
+                #            self._d_command.handleAngleRad = -1
+                #         elif(t % 2 == 1):
+                #            self._d_command.handleAngleRad = 1
+                #         #else:
+                #         #   self._d_command.handleAngleRad = 0
+                #
+                #        print t
+		self._commandOut.write()
 
 		return RTC.RTC_OK
 	
