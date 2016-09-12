@@ -181,6 +181,7 @@ class CarSimTest(OpenRTM_aist.DataFlowComponentBase):
 	#	#
 	#	#
 	def onActivated(self, ec_id):
+		self._interval = 2.0
 		self._activatedClock = time.clock() ## Here, the time when onActivated called is stored as a member variable of this class.
 		return RTC.RTC_OK
 	
@@ -272,6 +273,7 @@ class CarSimTest(OpenRTM_aist.DataFlowComponentBase):
                 #         #   self._d_command.handleAngleRad = 0
                 #
                 #        print t
+		print self._d_command
 		self._commandOut.write()
 
 		return RTC.RTC_OK
