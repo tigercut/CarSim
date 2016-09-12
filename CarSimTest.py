@@ -253,16 +253,28 @@ class CarSimTest(OpenRTM_aist.DataFlowComponentBase):
                         
 	def onExecute(self, ec_id):
                 # print "onExecute"
+                t = int(time.clock())
 		if self._statusIn.isNew():
 			self._d_status = self._statusIn.read()
 			self._received = True
                         x = np.random.randn(1)
-                        self._d_command.acceleratorPressMeter = math.sin(x)
-                        self._d_command.handleAngleRad = math.sin(x)
+                        self._d_command.acceleratorPressMeter = 0.5
+                        #self._d_command.handleAngleRad = math.sin(x)
+                        #self._d_command.acceleratorPressMeter = 1
+                        if(t % 2 == 0):
+                            self._d_command.handleAngleRad = -1
+                        elif(t % 2 == 1):
+                            self._d_command.handleAngleRad = 1
+                        #else:
+                         #   self._d_command.handleAngleRad = 0
+
+                        print t
 			self._commandOut.write()
 
 		return RTC.RTC_OK
 	
+
+
 	#	##
 	#	#
 	#	# The aborting action when main logic error occurred.
